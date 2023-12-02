@@ -44,12 +44,14 @@ public class Main {
     private static void updateGame() {
         // Ici, mettez à jour la logique de votre jeu.
         // Par exemple, gérer les actions des joueurs, les événements du jeu, etc.
+        GameManager.getInstance().update();
     }
 
     private static void displayGameState() {
         // Affiche l'état actuel du jeu.
         // Par exemple, les ressources actuelles, l'état des bâtiments, etc.
         GameManager.getInstance().displayResources();
+        GameManager.getInstance().displayBuildings();
     }
 
     private static boolean checkGameOver() {

@@ -1,6 +1,6 @@
 package fromageofempire;
 
-public class WoodenCabin extends Building {
+public class WoodenCabin extends HousingBuilding {
     public WoodenCabin(int capacity) {
         super(capacity);
     }

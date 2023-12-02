@@ -1,6 +1,6 @@
 package fromageofempire;
 
-public class Quarry extends Building {
+public class Quarry extends ProductionBuilding {
     public Quarry(int capacity) {
         super(capacity);
     }

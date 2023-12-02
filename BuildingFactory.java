@@ -1,23 +1,31 @@
 package fromageofempire;
 
 public class BuildingFactory {
-    public static Building createBuilding(String type, int capacity) {
+
+    public BuildingFactory(GameManager observer)
+    {
+        Building.setObserver(observer);
+        HousingBuilding.setHousingObserver(observer);
+        ProductionBuilding.setProductionObserver(observer);
+    }
+
+    public Building createBuilding(BuildingType type, int capacity) {
         switch (type) {
-            case "House":
+            case House:
                 return new House(capacity);
-            case "WoodenCabin":
+            case WoodenCabin:
                 return new WoodenCabin(capacity);
-            case "ApartmentBuilding":
+            case ApartmentBuilding:
                 return new ApartmentBuilding(capacity);
-            case "Quarry":
+            case Quarry:
                 return new Quarry(capacity);
-            case "LumberMill":
+            case LumberMill:
                 return new LumberMill(capacity);
-            case "Farm":
+            case Farm:
                 return new Farm(capacity);
-            case "CementPlant":
+            case CementPlant:
                 return new CementPlant(capacity);
-            case "ToolFactory":
+            case ToolFactory:
                 return new ToolFactory(capacity);
             // Ajouter d'autres types de bâtiments
             default:

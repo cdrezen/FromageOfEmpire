@@ -1,6 +1,6 @@
 package fromageofempire;
 
-public class ToolFactory extends Building {
+public class ToolFactory extends ProductionBuilding {
     public ToolFactory(int capacity) {
         super(capacity);
     }

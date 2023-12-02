@@ -1,6 +1,6 @@
 package fromageofempire;
 
-public class LumberMill extends Building {
+public class LumberMill extends ProductionBuilding {
     public LumberMill(int capacity) {
         super(capacity);
     }

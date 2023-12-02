@@ -1,6 +1,6 @@
 package fromageofempire;
 
-public class House extends Building {
+public class House extends HousingBuilding {
     public House(int capacity) {
         super(capacity);
     }
