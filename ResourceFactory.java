@@ -1,4 +1,4 @@
-package org.example;
+package fromageofempire;
 
 public class ResourceFactory {
     public static Resource createResource(ResourceType type, int quantity) {

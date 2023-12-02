@@ -1,4 +1,4 @@
-package org.example;
+package fromageofempire;
 
 public class Resource {
     private ResourceType type;

@@ -1,4 +1,4 @@
-package org.example;
+package fromageofempire;
 
 public enum ResourceType {
     // Ajoutez d'autres types de ressources selon les besoins
