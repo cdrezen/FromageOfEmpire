@@ -7,6 +7,7 @@ public abstract class Building {
     public Building(int capacity) {
         this.capacity = capacity;
         this.level = 1; // Niveau initial
+
     }
 
     // Méthodes communes à tous les bâtiments, comme upgrade(), repair(), etc.

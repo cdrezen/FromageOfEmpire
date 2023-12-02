@@ -18,7 +18,8 @@ public class Main {
         System.out.println("Initialisation du jeu...");
 
         // Exemple : Initialisation des ressources de base
-        GameManager.getInstance().initializeResources();
+        GameManager.getInstance();
+        GameManager.initializeResources();
 
         // Autres initialisations si nécessaire
     }
@@ -49,7 +50,7 @@ public class Main {
     private static void displayGameState() {
         // Affiche l'état actuel du jeu.
         // Par exemple, les ressources actuelles, l'état des bâtiments, etc.
-        GameManager.getInstance().displayResources();
+        GameManager.getInstance();
     }
 
     private static boolean checkGameOver() {
