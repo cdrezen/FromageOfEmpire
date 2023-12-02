@@ -25,4 +25,15 @@ public class Resource {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public void addQuantity(int quantity)
+    {
+        this.quantity += quantity;
+    }
+
+    public void removeQuantity(int quantity)
+    {
+        this.quantity -= quantity;
+        //if(this.quantity < 0) this.quantity = 0;
+    }
 }
