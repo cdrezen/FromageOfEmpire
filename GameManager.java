@@ -20,8 +20,8 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
         initializeResources();
         initializeVillagers();
 
-        buildings.add(buildingFactory.createBuilding(BuildingType.House, 4));
-        buildings.add(buildingFactory.createBuilding(BuildingType.Farm, 4));
+        buildings.add(buildingFactory.createBuilding(BuildingType.House));
+        buildings.add(buildingFactory.createBuilding(BuildingType.Farm));
     }
 
     public static GameManager getInstance() {
@@ -40,6 +40,8 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
         resources.put(ResourceType.GOLD, ResourceFactory.createResource(ResourceType.GOLD, 100));
         resources.put(ResourceType.FOOD, ResourceFactory.createResource(ResourceType.FOOD, 50));
         resources.put(ResourceType.WOOD, ResourceFactory.createResource(ResourceType.WOOD, 30));
+        resources.put(ResourceType.STONE, ResourceFactory.createResource(ResourceType.STONE, 30));
+
         // Ajouter d'autres ressources selon les besoins
     }
     public void initializeVillagers()
@@ -74,30 +76,41 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
     public void OnStarving(Villager source) {
         // TODO Auto-generated method stub
         resources.get(ResourceType.FOOD).removeQuantity(1);
-        source.full = 10;
+        source.full = 2;
     }
 
     @Override
-    public void OnEmptyHousing(HousingBuilding source) {
+    public void OnEmptyHousing(HousingComponent source) {
         // TODO Auto-generated method stub
         for (Villager villager : villagers) {
             if(!villager.isHoused())
             {
                 villager.setHome(source);
-                if(source.capacity == source.getUsers().size()) break;
+                if(source.capacity == source.inhabitants.size()) break;
             }
         }
     }
 
     @Override
-    public void OnEmptyFactory(ProductionBuilding source) {
+    public void OnEmptyFactory(ProductionComponent source) {
         // TODO Auto-generated method stub
         for (Villager villager : villagers) {
             if(!villager.isWorker())
             {
                 villager.setWorkplace(source);
-                if(source.capacity == source.getUsers().size()) break;
+                if(source.capacity == source.workers.size()) break;
             }
+        }
+    }
+
+    @Override
+    public void OnProducedResource(ProductionComponent source, Resource[] produced, Resource[] cost) {
+        for (Resource product : produced) {
+            resources.get(product.getType()).addQuantity(product.getQuantity());
+        }
+        if(cost == null) return;
+        for (Resource loss : cost) {
+            resources.get(loss.getType()).removeQuantity(loss.getQuantity());
         }
     }
 
@@ -113,7 +126,7 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
     public void displayBuildings() 
     {
         for (Building building : buildings) {
-            System.out.printf("building %s users:%d\n", building.getClass().getSimpleName(), building.getUsers().size());
+            System.out.printf("building %s users:%d\n", building.getClass().getSimpleName(), building.getUsersCount());
         }   
     }
 }

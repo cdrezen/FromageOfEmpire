@@ -1,5 +1,5 @@
 package fromageofempire;
 
 public enum BuildingType {
-    ApartmentBuilding, House, WoodenCabin, Quarry, ToolFactory, CementPlant, LumberMill, Farm
+    ApartmentBuilding, House, WoodenCabin, Quarry, ToolFactory, SteelMill, CementPlant, LumberMill, Farm
 }

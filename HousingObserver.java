@@ -1,5 +1,5 @@
 package fromageofempire;
 
 public interface HousingObserver {
-    public void OnEmptyHousing(HousingBuilding source);
+    public void OnEmptyHousing(HousingComponent source);
 }

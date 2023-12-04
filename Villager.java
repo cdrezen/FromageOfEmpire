@@ -5,8 +5,8 @@ public class Villager
      * sassieté du villageois
      */
     int full;
-    Building home;
-    Building workplace;
+    HousingComponent home;
+    ProductionComponent workplace;
     //String name;
 
     VillagerObserver observer;
@@ -14,21 +14,18 @@ public class Villager
     public Villager(VillagerObserver observer) 
     {
         this.observer = observer;
-        this.full = 10;
+        this.full = 2;
     }
 
-    public Villager(VillagerObserver observer, Building home) 
+    public Villager(VillagerObserver observer, HousingComponent home) 
     {
-        this.observer = observer;
-        this.full = 10;
+        this(observer);
         this.home = home;
     }
 
-    public Villager(VillagerObserver observer, Building home, Building workplace) 
+    public Villager(VillagerObserver observer, HousingComponent home, ProductionComponent workplace) 
     {
-        this.observer = observer;
-        this.full = 10;
-        this.home = home;
+        this(observer, home);
         this.workplace = workplace;
     }
 
@@ -51,24 +48,24 @@ public class Villager
         return (this.home != null);
     }
 
-    public Building getHome() {
+    public HousingComponent getHome() {
         return home;
     }
 
-    public void setHome(Building home) {
-        if(isHoused()) this.home.removeUser(this);
+    public void setHome(HousingComponent home) {
+        if(isHoused()) this.home.removeInhabitant(this);
         this.home = home;
-        home.addUser(this);
+        home.addInhabitant(this);
     }
 
-    public Building getWorkplace() {
+    public ProductionComponent getWorkplace() {
         return workplace;
     }
 
-    public void setWorkplace(Building workplace) {
-        if(isWorker()) this.workplace.removeUser(this);
+    public void setWorkplace(ProductionComponent workplace) {
+        if(isWorker()) this.workplace.removeWorker(this);
         this.workplace = workplace;
-        workplace.addUser(this);
+        workplace.addWorker(this);
     }
 }
 

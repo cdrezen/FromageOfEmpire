@@ -1,9 +1,14 @@
 package fromageofempire;
 
+import java.util.Scanner;
+
 public class Main {
+
+    static Scanner scanner;
     public static void main(String[] args) {
         // Initialisation du gestionnaire de jeu
         GameManager gameManager = GameManager.getInstance();
+        scanner = new Scanner(System.in);
 
         // Initialisation des ressources et des paramètres de départ
         initializeGame();
@@ -33,6 +38,8 @@ public class Main {
 
             // Afficher l'état actuel du jeu
             displayGameState();
+
+            scanner.nextLine();
 
             // Vérifier les conditions de fin de jeu
             isRunning = checkGameOver();
