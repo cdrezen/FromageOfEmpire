@@ -7,6 +7,7 @@ public class BuildingFactory {
 
     public BuildingFactory(GameManager observer)
     {
+        Building.setObserver(observer);
         HousingComponent.setHousingObserver(observer);
         ProductionComponent.setProductionObserver(observer);
     }
@@ -20,9 +21,21 @@ public class BuildingFactory {
         put(BuildingType.ToolFactory, new Resource[][]{ new Resource[]{ new Resource(ResourceType.STEEL, 4), new Resource(ResourceType.COAL, 4)}, new Resource[]{ new Resource(ResourceType.TOOLS, 4)  }});
     }};
 
+    static final Map<BuildingType, Integer> buildTime = new HashMap<>(){{        
+        put(BuildingType.WoodenCabin,  2);
+        put(BuildingType.House,  4);
+        put(BuildingType.ApartmentBuilding,  6);
+        put(BuildingType.Farm,  2);
+        put(BuildingType.Quarry,  2);
+        put(BuildingType.LumberMill,  4);
+        put(BuildingType.CementPlant,  4);
+        put(BuildingType.SteelMill,  6);
+        put(BuildingType.ToolFactory,  8);
+    }};
+
     public Building createBuilding(BuildingType type) {
 
-        Building building = new Building();
+        Building building = new Building(type, buildTime.get(type));
 
         switch (type) {
             case House:

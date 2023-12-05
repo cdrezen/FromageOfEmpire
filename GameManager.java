@@ -158,7 +158,14 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
     public void displayBuildings() 
     {
         for (Building building : buildings) {
-            System.out.printf("building %s users:%d\n", building.getClass().getSimpleName(), building.getUsersCount());
+            System.out.printf("building %s users:%d\n", building.type, building.getUsersCount());
         }   
+    }
+
+
+    @Override
+    public void OnBuilt(Building source) {
+        // TODO Auto-generated method stub
+        System.out.printf("%s built.\n", source.type);
     }
 }
