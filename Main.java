@@ -1,5 +1,6 @@
 package fromageofempire;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -17,6 +18,8 @@ public class Main {
         // Boucle principale du jeu (peut être remplacée par votre propre logique de
         // jeu)
         runGameLoop();
+        scanner.close(); // Fermer le scanner à la fin de la boucle de jeu
+
     }
 
     private static void initializeGame() {
@@ -32,84 +35,40 @@ public class Main {
     }
 
     private static void runGameLoop() {
-        Scanner scanner = new Scanner(System.in); // Crée un scanner pour lire l'entrée du clavier
-
         // La boucle de jeu principal
         boolean isRunning = true;
-
-        while (isRunning) {
-            System.out.println("Entrez une action: (q pour quitter, p pour jouer)");
-
-            // Lire l'entrée de l'utilisateur
-            String input = scanner.nextLine();
-
-            // Effectuer une action en fonction de l'entrée
-            if ("q".equalsIgnoreCase(input)) {
-                System.out.println("Quitting the game...");
-                isRunning = false; // Mettre fin à la boucle de jeu
-            } else if ("p".equalsIgnoreCase(input)) {
-                // Ici, vous pouvez ajouter la logique pour traiter un tour de jeu
-                // Mettre à jour le jeu
-                updateGame();
-
-                // Afficher l'état actuel du jeu
-                displayGameState();
-                System.out.println("Processing turn...");
-            }
-            else {
-                System.out.println("Entrée non reconnue.");
-            }
-
-        }
 
         while (isRunning) {
             System.out.println("Entrez une action: ('q' pour quitter, 'Entrée' pour passer le tour)");
 
             // Lire l'entrée de l'utilisateur
-            String input = scanner.nextLine();
+            String[] input = scanner.nextLine().split(" ");
+            String command = input[0];
+            String[] params = Arrays.copyOfRange(input, 1, input.length);
 
-            switch (input) {
+            switch (command) {
                 case "q":
                     System.out.println("Quitting the game...");
                     isRunning = false; // Mettre fin à la boucle de jeu
-                    break;
+                    return;
                 case "build":
-                    
+                    GameManager.getInstance().buildCommand(params[0]);
+                    break;
+                case "":
                     break;
             
                 default:
-                    break;
-            }
-            // Effectuer une action en fonction de l'entrée
-            if ("q".equalsIgnoreCase(input)) {
-                
-            } else if ("p".equalsIgnoreCase(input)) {
-                // Ici, vous pouvez ajouter la logique pour traiter un tour de jeu
-                // Mettre à jour le jeu
-                updateGame();
-
-                // Afficher l'état actuel du jeu
-                displayGameState();
-                System.out.println("Processing turn...");
-            } else if ("c".equalsIgnoreCase(input)) {
-
-                GameManager.getInstance().addBuilding("FARM");
-                BuildingFactory.updateGame();
-
-                // Afficher l'état actuel du jeu
-                displayGameState();
-                System.out.println("Processing turn...");
-            } else {
-                System.out.println("Entrée non reconnue.");
+                    System.out.println("Entrée non reconnue.");
+                    continue;
             }
 
+            System.out.println("Processing turn...");
+            // Faire tourner un tour le jeu
+            updateGame();
+            // Afficher l'état actuel du jeu
+            displayGameState();
+            checkGameOver();
         }
-
-        System.out.println("Fin de la partie.");
-        scanner.close(); // Fermer le scanner à la fin de la boucle de jeu
-
-        System.out.println("Fin de la partie.");
-        scanner.close(); // Fermer le scanner à la fin de la boucle de jeu
     }
     private static void updateGame() {
         // Ici, mettez à jour la logique de votre jeu.

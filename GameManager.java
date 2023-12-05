@@ -51,19 +51,36 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
     }
     public void initializeVillagers()
     {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             villagers.add(new Villager(this));
         }
     }
 
-    public boolean buildCommand(String buildingName)
+    public void buildCommand(String buildingName)
     {
         if(buildingName.equals("help"))
         {
             System.err.println("list of buildings:");
+            for (BuildingType type : BuildingType.values()) {
+                System.err.println(type.toString().toLowerCase());
+            }
+            return;
         }
-        
-        buildingFactory.createBuilding(null)
+
+        BuildingType type = null;
+        for (BuildingType t : BuildingType.values()) {
+            if(t.toString().toLowerCase().equalsIgnoreCase(buildingName)) { 
+                type = t;
+                break;
+            }
+        }
+
+        if(type != null)
+        {
+            //!\\empecher si pas assez de resources
+            buildings.add(buildingFactory.createBuilding(type));
+        }
+        else buildCommand("help");
     }
 
     public void update()
