@@ -26,6 +26,7 @@ public class BuildingFactory {
 
         switch (type) {
             case House:
+
                 building.add(new HousingComponent(4));
                 break;
             case WoodenCabin:

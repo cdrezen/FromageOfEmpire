@@ -7,22 +7,36 @@ import java.util.Map;
 
 public class GameManager implements VillagerObserver, BuildingObserver, HousingObserver, ProductionObserver {
     private static GameManager instance;
+
+
+
     private HashMap<ResourceType, Resource> resources;
+
+    private void initializeResources() {
+        resources = new HashMap<>();
+        for (ResourceType type : ResourceType.values()) {
+            resources.put(type, new Resource(type, 0));
+        }
+    }
+
     BuildingFactory buildingFactory;
     private List<Building> buildings;
     private ArrayList<Villager> villagers;
 
     private GameManager() {
-        resources = new HashMap<ResourceType, Resource>();
+        resources = new HashMap<>(); // Initialisation du HashMap
+        initializeResources(); // Remplissage du HashMap avec les ressources initiales
+
         buildingFactory = new BuildingFactory(this);
-        buildings = new ArrayList<Building>();
-        villagers = new ArrayList<Villager>();
-        initializeResources();
+        buildings = new ArrayList<>();
+        villagers = new ArrayList<>();
+
         initializeVillagers();
 
         buildings.add(buildingFactory.createBuilding(BuildingType.House));
         buildings.add(buildingFactory.createBuilding(BuildingType.Farm));
     }
+
 
     public static GameManager getInstance() {
         if (instance == null) {
@@ -34,15 +48,6 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
 
     public void addBuilding(Building building) {
         buildings.add(building);
-    }
-    public void initializeResources() {
-        // Initialiser les ressources de base avec des quantités initiales pour le joueur
-        resources.put(ResourceType.GOLD, ResourceFactory.createResource(ResourceType.GOLD, 100));
-        resources.put(ResourceType.FOOD, ResourceFactory.createResource(ResourceType.FOOD, 50));
-        resources.put(ResourceType.WOOD, ResourceFactory.createResource(ResourceType.WOOD, 30));
-        resources.put(ResourceType.STONE, ResourceFactory.createResource(ResourceType.STONE, 30));
-
-        // Ajouter d'autres ressources selon les besoins
     }
     public void initializeVillagers()
     {

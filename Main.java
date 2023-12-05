@@ -23,31 +23,44 @@ public class Main {
         System.out.println("Initialisation du jeu...");
 
         // Exemple : Initialisation des ressources de base
-        GameManager.getInstance().initializeResources();
 
         // Autres initialisations si nécessaire
     }
 
     private static void runGameLoop() {
+        Scanner scanner = new Scanner(System.in); // Crée un scanner pour lire l'entrée du clavier
+
         // La boucle de jeu principal
         boolean isRunning = true;
 
         while (isRunning) {
-            // Mettre à jour le jeu
-            updateGame();
+            System.out.println("Entrez une action: (q pour quitter, p pour jouer)");
 
-            // Afficher l'état actuel du jeu
-            displayGameState();
+            // Lire l'entrée de l'utilisateur
+            String input = scanner.nextLine();
 
-            scanner.nextLine();
+            // Effectuer une action en fonction de l'entrée
+            if ("q".equalsIgnoreCase(input)) {
+                System.out.println("Quitting the game...");
+                isRunning = false; // Mettre fin à la boucle de jeu
+            } else if ("p".equalsIgnoreCase(input)) {
+                // Ici, vous pouvez ajouter la logique pour traiter un tour de jeu
+                // Mettre à jour le jeu
+                updateGame();
 
-            // Vérifier les conditions de fin de jeu
-            isRunning = checkGameOver();
+                // Afficher l'état actuel du jeu
+                displayGameState();
+                System.out.println("Processing turn...");
+            }
+            else {
+                System.out.println("Entrée non reconnue.");
+            }
+
         }
 
         System.out.println("Fin de la partie.");
+        scanner.close(); // Fermer le scanner à la fin de la boucle de jeu
     }
-
     private static void updateGame() {
         // Ici, mettez à jour la logique de votre jeu.
         // Par exemple, gérer les actions des joueurs, les événements du jeu, etc.
