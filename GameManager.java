@@ -58,8 +58,8 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         for (int i = 0; i < quantity; i++) 
         {
             Villager v = new Villager(this);
-            v.setHome(home);
             villagers.add(v);
+            v.setHome(home);
         }
     }
 

@@ -42,7 +42,7 @@ public class Building implements BuildingComponent {
         {
             currentBuildStep++;
             if(isBuilt()) onBuilt();
-            return;
+            else return;
         }
 
         for (BuildingComponent buildingComponent : children) {
@@ -76,7 +76,7 @@ public class Building implements BuildingComponent {
             componentDesc.add(buildingComponent.toString());
         }
 
-        return String.format("%s : [%s]", name, String.join(", ", componentDesc));
+        return String.format("%s %s: [%s]", name, isBuilt() ? "" : "(building...) ", String.join(", ", componentDesc));
     }
 
     // Méthodes communes à tous les bâtiments, comme upgrade(), repair(), etc.
