@@ -1,22 +1,28 @@
 package fromageofempire;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class GameManager implements VillagerObserver, BuildingObserver, HousingObserver, ProductionObserver {
+import javax.lang.model.type.ArrayType;
+
+public class GameManager implements VillagerObserver, HousingObserver, ProductionObserver {
     private static GameManager instance;
-
-
 
     private HashMap<ResourceType, Resource> resources;
 
-    private void initializeResources() {
-        resources = new HashMap<>();
+    private void initializeResources() 
+    {
         for (ResourceType type : ResourceType.values()) {
             resources.put(type, new Resource(type, 0));
         }
+
+        resources.get(ResourceType.GOLD).setQuantity(5);
+        resources.get(ResourceType.FOOD).setQuantity(20);
+        resources.get(ResourceType.WOOD).setQuantity(10);
+        resources.get(ResourceType.STONE).setQuantity(10);
+
     }
 
     BuildingFactory buildingFactory;
@@ -31,10 +37,8 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
         buildings = new ArrayList<>();
         villagers = new ArrayList<>();
 
-        initializeVillagers();
-
         buildings.add(buildingFactory.createBuilding(BuildingType.House));
-        buildings.add(buildingFactory.createBuilding(BuildingType.Farm));
+        buildings.add(buildingFactory.createBuilding(BuildingType.WoodenCabin));
     }
 
 
@@ -49,10 +53,13 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
     public void addBuilding(Building building) {
         buildings.add(building);
     }
-    public void initializeVillagers()
+    public void addVillagers(int quantity, HousingComponent home)
     {
-        for (int i = 0; i < 100; i++) {
-            villagers.add(new Villager(this));
+        for (int i = 0; i < quantity; i++) 
+        {
+            Villager v = new Villager(this);
+            v.setHome(home);
+            villagers.add(v);
         }
     }
 
@@ -60,9 +67,9 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
     {
         if(buildingName.equals("help"))
         {
-            System.err.println("list of buildings:");
+            System.out.println("list of buildings:");
             for (BuildingType type : BuildingType.values()) {
-                System.err.println(type.toString().toLowerCase());
+                System.out.printf("%s %s\n", type.toString().toLowerCase(), Arrays.toString(type.getRecipe()));
             }
             return;
         }
@@ -78,6 +85,16 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
         if(type != null)
         {
             //!\\empecher si pas assez de resources
+            for (Resource resource : type.getRecipe()) {
+                if(resource.getQuantity() > resources.get(resource.getType()).getQuantity())
+                {
+                    System.out.printf("Not enough resources for %s\n", type);
+                    return;
+                }
+            }
+
+            for (Resource resource : type.getRecipe()) { resources.get(resource.getType()).removeQuantity(resource.getQuantity()); }
+
             buildings.add(buildingFactory.createBuilding(type));
         }
         else buildCommand("help");
@@ -100,11 +117,6 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
     }
 
     @Override
-    public void OnEmpty(Building source) {
-        //if(source instanceof HousingBuilding)
-    }
-
-    @Override
     public void OnStarving(Villager source) {
         // TODO Auto-generated method stub
         resources.get(ResourceType.FOOD).removeQuantity(1);
@@ -112,15 +124,20 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
     }
 
     @Override
+    public void OnBuiltHousing(HousingComponent source) {
+        addVillagers(source.getCapacity(), source);
+    }
+
+     @Override
+    public void OnBuiltFactory(ProductionComponent source) {
+        // TODO Auto-generated method stub
+        //throw new UnsupportedOperationException("Unimplemented method 'OnBuiltFactory'");
+    }
+    
+    @Override
     public void OnEmptyHousing(HousingComponent source) {
         // TODO Auto-generated method stub
-        for (Villager villager : villagers) {
-            if(!villager.isHoused())
-            {
-                villager.setHome(source);
-                if(source.capacity == source.inhabitants.size()) break;
-            }
-        }
+        //throw new UnsupportedOperationException("Unimplemented method 'OnEmptyHousing'");
     }
 
     @Override
@@ -129,25 +146,30 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
         for (Villager villager : villagers) {
             if(!villager.isWorker())
             {
+                if(source.getCapacity() == source.getUsersCount()) break;
                 villager.setWorkplace(source);
-                if(source.capacity == source.workers.size()) break;
             }
         }
     }
 
     @Override
-    public void OnProducedResource(ProductionComponent source, Resource[] produced, Resource[] cost) {
-        for (Resource product : produced) {
+    public void OnProducedResource(ProductionComponent source, Production produced) {
+        for (Resource product : produced.getOutput()) {
             resources.get(product.getType()).addQuantity(product.getQuantity());
         }
-        if(cost == null) return;
-        for (Resource loss : cost) {
+        if(!produced.hasInput()) return;
+        for (Resource loss : produced.getInput()) {
             resources.get(loss.getType()).removeQuantity(loss.getQuantity());
         }
     }
 
     // ... autres méthodes du GameManager ...
     
+    public void displayVillagers()
+    {
+        System.out.printf("villagers: %d\n", villagers.size());
+    }
+
     public void displayResources() 
     {
         for (Resource resource : resources.values()) {
@@ -158,14 +180,7 @@ public class GameManager implements VillagerObserver, BuildingObserver, HousingO
     public void displayBuildings() 
     {
         for (Building building : buildings) {
-            System.out.printf("building %s users:%d\n", building.type, building.getUsersCount());
+            System.out.println(building.toString());
         }   
-    }
-
-
-    @Override
-    public void OnBuilt(Building source) {
-        // TODO Auto-generated method stub
-        System.out.printf("%s built.\n", source.type);
     }
 }

@@ -79,6 +79,7 @@ public class Main {
     private static void displayGameState() {
         // Affiche l'état actuel du jeu.
         // Par exemple, les ressources actuelles, l'état des bâtiments, etc.
+        GameManager.getInstance().displayVillagers();
         GameManager.getInstance().displayResources();
         GameManager.getInstance().displayBuildings();
     }

@@ -36,4 +36,14 @@ public class Resource {
         this.quantity -= quantity;
         //if(this.quantity < 0) this.quantity = 0;
     }
+
+    public static Resource[] asArray(Resource ... resources)
+    {
+        return resources;
+    }
+
+    @Override
+    public String toString() {
+        return type.toString() + ':' + quantity;
+    }
 }

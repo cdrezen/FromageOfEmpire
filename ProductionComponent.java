@@ -5,15 +5,13 @@ import java.util.ArrayList;
 public class ProductionComponent implements BuildingComponent {
 
     int capacity;
-    Resource[] input;
-    Resource[] output;
+    Production production;
     ArrayList<Villager> workers;
     static ProductionObserver productionObserver;
 
-    public ProductionComponent(int capacity, Resource[] input, Resource[] output) {
+    public ProductionComponent(int capacity, Production production) {
         this.capacity = capacity;
-        this.input = input;
-        this.output = output;
+        this.production = production;
         workers = new ArrayList<Villager>();
     }
 
@@ -47,37 +45,34 @@ public class ProductionComponent implements BuildingComponent {
 
         if(isAtMaxCapacity()) 
         {
-            productionObserver.OnProducedResource(this, input, output);
+            productionObserver.OnProducedResource(this, production);
             return;
         }
-
-        double efficiency = getUsersCount()/getCapacity();
-
-        Resource[] produced = output.clone();
-
-        for (Resource product : produced) 
+        else
         {
-            product.setQuantity((int)(efficiency * product.getQuantity()));
+            productionObserver.OnEmptyFactory(this);
         }
 
-        if(input == null) {
-            productionObserver.OnProducedResource(this, produced, input);
-            return;
-        }
-
-        Resource[] consumed = input.clone();
-
-        for (Resource loss : consumed) 
-        {
-            loss.setQuantity((int)(efficiency * loss.getQuantity()));
-        }
-
-        productionObserver.OnProducedResource(this, produced, consumed);
+        double efficiency = (double)getUsersCount()/getCapacity();
+        System.err.println(efficiency);
+        Production produced = production.produce(efficiency);
+        productionObserver.OnProducedResource(this, produced);
     }
 
     @Override
     public int getUsersCount() {
         return workers.size();
     }
+
+    @Override
+    public void onBuilt() {
+        // TODO Auto-generated method stub
+        productionObserver.OnBuiltFactory(this);
+    }
     
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        return "workers: " + getUsersCount();
+    }
 }

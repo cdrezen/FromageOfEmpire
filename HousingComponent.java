@@ -2,7 +2,7 @@ package fromageofempire;
 
 import java.util.ArrayList;
 
-public class HousingComponent implements BuildingComponent {
+class HousingComponent implements BuildingComponent {
 
     static HousingObserver housingObserver;
     ArrayList<Villager> inhabitants;
@@ -16,6 +16,10 @@ public class HousingComponent implements BuildingComponent {
     public static void setHousingObserver(HousingObserver _housingObserver)
     {
         housingObserver = _housingObserver;
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
     
     public void addInhabitant(Villager villager) {
@@ -40,5 +44,16 @@ public class HousingComponent implements BuildingComponent {
     @Override
     public int getUsersCount() {
         return inhabitants.size();
+    }
+
+    @Override
+    public void onBuilt() {
+        housingObserver.OnBuiltHousing(this);
+    }
+
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        return "inhabitants: " + getUsersCount();
     }
 }

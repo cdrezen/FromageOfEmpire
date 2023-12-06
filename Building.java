@@ -1,5 +1,6 @@
 package fromageofempire;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Building implements BuildingComponent {
     BuildingType type;
@@ -9,19 +10,14 @@ public class Building implements BuildingComponent {
 
     ArrayList<BuildingComponent> children;
     //protected ArrayList<Villager> users;
-    protected static BuildingObserver observer;
+    //protected static BuildingObserver observer;
 
-    public Building(BuildingType type, int buildTime) {
+    public Building(BuildingType type) {
         this.type = type;
         this.level = 1; // Niveau initial
-        this.buildTime = buildTime;
+        this.buildTime = type.buildTime;
         children = new ArrayList<BuildingComponent>();
         //users = new ArrayList<Villager>();
-    }
-
-    public static void setObserver(BuildingObserver _observer)
-    {
-        observer = _observer;
     }
 
     public BuildingType getType() { return this.type; }
@@ -39,12 +35,13 @@ public class Building implements BuildingComponent {
         children.remove(component);
     }
 
+    @Override
     public void update()
     {
         if(!isBuilt())
         {
             currentBuildStep++;
-            if(isBuilt()) observer.OnBuilt(this);
+            if(isBuilt()) onBuilt();
             return;
         }
 
@@ -62,10 +59,35 @@ public class Building implements BuildingComponent {
         return count;
     }
 
+    @Override
+    public void onBuilt() 
+    {
+        for (BuildingComponent buildingComponent : children) {
+            buildingComponent.onBuilt();
+        }
+    }
+
+    @Override
+    public String toString() {
+        String name = type.toString();
+        ArrayList<String> componentDesc = new ArrayList<>();
+
+        for (BuildingComponent buildingComponent : children) {
+            componentDesc.add(buildingComponent.toString());
+        }
+
+        return String.format("%s : [%s]", name, String.join(", ", componentDesc));
+    }
+
     // Méthodes communes à tous les bâtiments, comme upgrade(), repair(), etc.
 
    /*  public ArrayList<Villager> getUsers() {
         return users;
+    }
+
+    public static void setObserver(BuildingObserver _observer)
+    {
+        observer = _observer;
     }
 
     public abstract void addUser(Villager villager);
