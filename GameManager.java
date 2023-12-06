@@ -5,42 +5,30 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.lang.model.type.ArrayType;
-
-public class GameManager implements VillagerObserver, HousingObserver, ProductionObserver {
+public class GameManager implements VillagerObserver, HousingObserver, ProductionObserver
+{
     private static GameManager instance;
-
     private HashMap<ResourceType, Resource> resources;
-
-    private void initializeResources() 
-    {
-        for (ResourceType type : ResourceType.values()) {
-            resources.put(type, new Resource(type, 0));
-        }
-
-        resources.get(ResourceType.GOLD).setQuantity(5);
-        resources.get(ResourceType.FOOD).setQuantity(20);
-        resources.get(ResourceType.WOOD).setQuantity(10);
-        resources.get(ResourceType.STONE).setQuantity(10);
-
-    }
-
-    BuildingFactory buildingFactory;
+    private BuildingFactory buildingFactory;
     private List<Building> buildings;
     private ArrayList<Villager> villagers;
+    private ArrayList<Villager> dead_villagers;
+    private double last_sustainability;
 
-    private GameManager() {
+    private GameManager() 
+    {
         resources = new HashMap<>(); // Initialisation du HashMap
         initializeResources(); // Remplissage du HashMap avec les ressources initiales
 
         buildingFactory = new BuildingFactory(this);
         buildings = new ArrayList<>();
         villagers = new ArrayList<>();
+        dead_villagers = new ArrayList<>();
+        last_sustainability = 1;
 
         buildings.add(buildingFactory.createBuilding(BuildingType.House));
         buildings.add(buildingFactory.createBuilding(BuildingType.WoodenCabin));
     }
-
 
     public static GameManager getInstance() {
         if (instance == null) {
@@ -49,6 +37,19 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         return instance;
     }
 
+    private void initializeResources() 
+    {
+        for (ResourceType type : ResourceType.values()) {
+            resources.put(type, new Resource(type, 0));
+        }
+
+        resources.get(ResourceType.GOLD).setQuantity(7);
+        resources.get(ResourceType.FOOD).setQuantity(20);
+        resources.get(ResourceType.WOOD).setQuantity(25);
+        resources.get(ResourceType.STONE).setQuantity(25);
+
+        Villager.setFoodSource(resources.get(ResourceType.FOOD));
+    }
 
     public void addBuilding(Building building) {
         buildings.add(building);
@@ -62,6 +63,18 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
             v.setHome(home);
         }
     }
+
+    public void clearDeadVillagers()
+    {
+        for (Villager v : dead_villagers) {
+            v.setHome(null);
+            v.setWorkplace(null);
+            villagers.remove(v);
+        }
+
+        dead_villagers.clear();
+    }
+    
 
     public void buildCommand(String buildingName)
     {
@@ -102,12 +115,18 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
 
     public void update()
     {
-        for (Villager villager : villagers) {
+        for(Villager villager : villagers)
+        {
             villager.update();
         }
-        for (Building building : buildings) {
+        for (Building building : buildings)
+        {
             building.update();
         }
+
+        if(dead_villagers.size() > 0) clearDeadVillagers();
+        last_sustainability = sustainability();
+        System.out.println(last_sustainability);
     }
 
     public void changeResourceQuantity(ResourceType type, int amount) {
@@ -116,16 +135,17 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         }
     }
 
+    double sustainability() { return (resources.get(ResourceType.FOOD).getQuantity() + Villager.MAX_STARVATION_DURATION) / (villagers.size() * Villager.FOOD_CONSUMPTION + 1);}
+
     @Override
     public void OnStarving(Villager source) {
         // TODO Auto-generated method stub
-        resources.get(ResourceType.FOOD).removeQuantity(1);
-        source.full = 2;
+        
     }
 
     @Override
     public void OnBuiltHousing(HousingComponent source) {
-        addVillagers(source.getCapacity(), source);
+        //addVillagers(source.getCapacity(), source);
     }
 
      @Override
@@ -136,8 +156,13 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     
     @Override
     public void OnEmptyHousing(HousingComponent source) {
-        // TODO Auto-generated method stub
-        //throw new UnsupportedOperationException("Unimplemented method 'OnEmptyHousing'");
+
+        last_sustainability = sustainability();
+        System.err.println(last_sustainability);
+        if(last_sustainability - 1 >= 0)
+        {
+            addVillagers((int)Math.min(last_sustainability, source.getCapacity()), source);
+        } 
     }
 
     @Override
@@ -182,5 +207,10 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         for (Building building : buildings) {
             System.out.println(building.toString());
         }   
+    }
+
+    @Override
+    public void OnDeath(Villager source) {
+        dead_villagers.add(source);
     }
 }

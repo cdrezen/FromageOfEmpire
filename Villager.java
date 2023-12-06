@@ -4,17 +4,22 @@ public class Villager
     /**
      * sassieté du villageois
      */
-    int full;
+    static final int FOOD_CONSUMPTION = 1;
+    static final int MAX_STARVATION_DURATION = 4;
+
+    static Resource food;
+    int starvation;
     HousingComponent home;
     ProductionComponent workplace;
     //String name;
+
 
     VillagerObserver observer;
 
     public Villager(VillagerObserver observer) 
     {
         this.observer = observer;
-        this.full = 2;
+        this.starvation = 0;
     }
 
     public Villager(VillagerObserver observer, HousingComponent home) 
@@ -29,10 +34,35 @@ public class Villager
         this.workplace = workplace;
     }
 
+    public static void setFoodSource(Resource source)
+    {
+        food = source;
+    }
+
+    public void eat()
+    {
+        if(food.getQuantity() == 0)
+        {
+            starvation++;
+            observer.OnStarving(this);
+            if(starvation == MAX_STARVATION_DURATION) observer.OnDeath(this);
+        }
+        else food.removeQuantity(FOOD_CONSUMPTION);
+    }
+
+    public void build()
+    {
+
+    }
+
+    public void work()
+    {
+
+    }
+
     public void update()
     {
-        this.full -= 1;
-        if(full == 0) observer.OnStarving(this);
+        eat();
     }
 
     /**
@@ -55,7 +85,7 @@ public class Villager
     public void setHome(HousingComponent home) {
         if(isHoused()) this.home.removeInhabitant(this);
         this.home = home;
-        home.addInhabitant(this);
+        if(home != null) home.addInhabitant(this);
     }
 
     public ProductionComponent getWorkplace() {
@@ -65,7 +95,7 @@ public class Villager
     public void setWorkplace(ProductionComponent workplace) {
         if(isWorker()) this.workplace.removeWorker(this);
         this.workplace = workplace;
-        workplace.addWorker(this);
+        if(workplace != null) workplace.addWorker(this);
     }
 }
 

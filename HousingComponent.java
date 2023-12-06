@@ -35,7 +35,7 @@ class HousingComponent implements BuildingComponent {
     @Override
     public void update() {
         
-        if(inhabitants.isEmpty()) 
+        if(inhabitants.size() < this.capacity) 
         {
             housingObserver.OnEmptyHousing(this);
         }
