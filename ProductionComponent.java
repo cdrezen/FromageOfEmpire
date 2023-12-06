@@ -54,9 +54,8 @@ public class ProductionComponent implements BuildingComponent {
         }
 
         double efficiency = (double)getUsersCount()/getCapacity();
-        System.err.println(efficiency);
         Production produced = production.produce(efficiency);
-        productionObserver.OnProducedResource(this, produced);
+        if(produced.getOutput() != null) productionObserver.OnProducedResource(this, produced);
     }
 
     @Override

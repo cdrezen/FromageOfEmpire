@@ -1,12 +1,20 @@
 package fromageofempire;
 
-public class Resource {
+import java.io.Serializable;
+
+public class Resource implements Serializable {
     private ResourceType type;
     private int quantity;
 
     public Resource(ResourceType type, int quantity) {
         this.type = type;
         this.quantity = quantity;
+    }
+
+    public Resource(Resource resource)
+    {
+        this.type = resource.type;
+        this.quantity = resource.quantity;
     }
 
     // Getters et setters

@@ -4,6 +4,8 @@ public class Production
 {
     Resource[] input;
     Resource[] output;
+    double tmp_efficiency = 0;
+    boolean requiresMoreEfficiency = false;
 
     public Production(Resource[] input, Resource[] output) 
     {
@@ -27,28 +29,42 @@ public class Production
 
     public boolean hasInput() { return (input != null); }
 
+    private Resource[] calculate(Resource[] resources, double efficiency)
+    {
+        Resource[] copy = new Resource[resources.length];
+
+        for (int i = 0; i < resources.length; i++) 
+        {   
+            ResourceType type = resources[i].getType();
+            int quantity = resources[i].getQuantity();
+
+            quantity *= tmp_efficiency + efficiency;
+            //System.err.println("qty:"+quantity +"base:"+resources[i].getQuantity());
+            if(!requiresMoreEfficiency && quantity == 0)
+            {
+                requiresMoreEfficiency = true;
+                return null;
+            }
+            copy[i] = new Resource(type, quantity);
+        }
+
+        return copy;
+    }
+
     public Production produce(double efficiency)
     {
-        Resource[] produced = output.clone();
+        Resource[] produced = calculate(output, efficiency);
+        Resource[] consumed = null;
 
-        for (Resource out : produced) 
-        {
-            int quantity = (int)efficiency * out.getQuantity();
-            //if(quantity == 0 && out.getQuantity() > 1) quantity = 1;
-            out.setQuantity(quantity);
+        if(produced != null && hasInput()) consumed = calculate(input, efficiency);
+
+        if(requiresMoreEfficiency) 
+        { 
+            tmp_efficiency += efficiency;
+            requiresMoreEfficiency = false;
         }
+        else tmp_efficiency = 0;
 
-        if(!hasInput()) return new Production(produced);
-
-        Resource[] consumed = input.clone();
-
-        for (Resource loss : consumed) 
-        {
-            int quantity = (int)efficiency * loss.getQuantity();
-            //if(quantity == 0 && loss.getQuantity() > 1) quantity = 1;
-            loss.setQuantity(quantity);
-        }
-
-        return new Production(produced, consumed);
+        return new Production(consumed, produced);
     }
 }
