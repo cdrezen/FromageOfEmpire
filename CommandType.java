@@ -25,9 +25,10 @@ public enum CommandType implements Command
 
     static void buildCommand(String[] params)
     {
-        String buildingName = params[0];
+        String buildingName = "";
+        if(params.length > 0) buildingName = params[0];
 
-        if(buildingName.equals("help"))
+        if(params.length < 1 || buildingName.equals("help"))
         {
             System.out.println("list of buildings:");
             for (BuildingType type : BuildingType.values()) {
@@ -59,6 +60,11 @@ public enum CommandType implements Command
 
     static int[] parseIndexAndSize(String[] params)
     {
+        if(params.length < 1) {
+            System.out.println("Usage: hire/fire <index> <nb(optional)>"); 
+            return null;
+        }
+        if(params.length < 1) return null;
         int index = parseInt(params[0]);
         if(index < 0) return null;
         int nb = -1;
@@ -68,8 +74,12 @@ public enum CommandType implements Command
 
     static void destroyCommand(String[] params)
     {
+        if(params.length < 1) {
+            System.out.println("Usage: destroy <index> <nb(optional)>"); 
+            return;
+        }
         int index = parseInt(params[0]);
-        if(index > 0) GameManager.getInstance().destroy(index);
+        if(index > -1) GameManager.getInstance().destroy(index);
     }
 
     static void hireCommand(String[] params)

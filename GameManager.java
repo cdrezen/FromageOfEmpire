@@ -179,6 +179,26 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         return (food + (food != 0 ? Villager.MAX_STARVATION_DURATION : 0)) / (villagers.size() * Villager.FOOD_CONSUMPTION + 1);
     }
 
+    public boolean isGameLost()
+    {
+        if(sustainability() == 0 && villagers.size() == 0) return true;
+        
+        if(resources.get(ResourceType.GOLD).getQuantity() < 4)
+        {
+            boolean is_quarry_built = false;
+            for (Building building : buildings) {
+                if(building.getType() == BuildingType.Quarry) {
+                    is_quarry_built = true;
+                    break;
+                }
+            }
+            if(!is_quarry_built) return true;
+        }
+
+
+        return false;
+    }
+
     @Override
     public void OnStarving(Villager source) {
         // TODO Auto-generated method stub

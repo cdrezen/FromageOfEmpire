@@ -82,18 +82,26 @@ public class Villager
         return home;
     }
 
-    public void setHome(HousingComponent home) {
-        if(isHoused()) this.home.removeInhabitant(this);
+    public void setHome(HousingComponent home)
+    {
         this.home = home;
+    }
+
+    public void changeHome(HousingComponent home) {
+        home.addInhabitant(this);
     }
 
     public ProductionComponent getWorkplace() {
         return workplace;
     }
 
-    public void setWorkplace(ProductionComponent workplace) {
-        if(isWorker()) this.workplace.removeWorker(this);
+    public void setWorkplace(ProductionComponent workplace)
+    {
         this.workplace = workplace;
+    }
+
+    public void changeWorkplace(ProductionComponent workplace) {
+        workplace.addWorker(this);
     }
 }
 

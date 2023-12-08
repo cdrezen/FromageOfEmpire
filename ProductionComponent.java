@@ -76,6 +76,7 @@ public class ProductionComponent implements BuildingComponent {
         for (Villager villager : workers) {
             villager.setWorkplace(null);
         }
+        workers.clear();
     }
 
     @Override

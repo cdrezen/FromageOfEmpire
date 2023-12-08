@@ -53,6 +53,8 @@ class HousingComponent implements BuildingComponent {
             // TODO Auto-generated method stub
             villager.setHome(null);
         }
+
+        this.inhabitants.clear();
     }
 
     @Override

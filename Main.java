@@ -52,7 +52,7 @@ public class Main {
                 updateGame();
                 // Afficher l'état actuel du jeu
                 displayGameState();
-                checkGameOver();
+                if(checkGameOver()) break;
             }
             else 
             {
@@ -92,7 +92,8 @@ public class Main {
 
     private static boolean checkGameOver() {
         // Déterminer si les conditions de fin de partie sont remplies.
-        // Retourner 'false' pour terminer la boucle de jeu.
-        return true; // Modifier cette condition en fonction de la logique de votre jeu
+        boolean lost = GameManager.getInstance().isGameLost();
+        if(lost) System.out.println("Game over.");
+        return lost; // Modifier cette condition en fonction de la logique de votre jeu
     }
 }
