@@ -9,7 +9,6 @@ public class Main {
 
     public static void main(String[] args) {
         // Initialisation du gestionnaire de jeu
-        GameManager gameManager = GameManager.getInstance();
         scanner = new Scanner(System.in);
 
         // Initialisation des ressources et des paramètres de départ
@@ -36,40 +35,47 @@ public class Main {
 
     private static void runGameLoop() {
         // La boucle de jeu principal
-        boolean isRunning = true;
+        GameManager gameManager = GameManager.getInstance();
+        gameManager.start();
 
-        while (isRunning) {
+        while (gameManager.isRunning()) {
             System.out.println("Entrez une action: ('q' pour quitter, 'Entrée' pour passer le tour)");
 
             // Lire l'entrée de l'utilisateur
             String[] input = scanner.nextLine().split(" ");
             String command = input[0];
-            String[] params = Arrays.copyOfRange(input, 1, input.length);
 
-            switch (command) {
-                case "q":
-                    System.out.println("Quitting the game...");
-                    isRunning = false; // Mettre fin à la boucle de jeu
-                    return;
-                case "build":
-                    GameManager.getInstance().buildCommand(params[0]);
-                    break;
-                case "":
-                    break;
-            
-                default:
-                    System.out.println("Entrée non reconnue.");
-                    continue;
+            if(command.equals(""))
+            {
+                System.out.println("Processing turn...");
+                // Faire tourner un tour le jeu
+                updateGame();
+                // Afficher l'état actuel du jeu
+                displayGameState();
+                checkGameOver();
             }
-
-            System.out.println("Processing turn...");
-            // Faire tourner un tour le jeu
-            updateGame();
-            // Afficher l'état actuel du jeu
-            displayGameState();
-            checkGameOver();
+            else 
+            {
+                String[] params = Arrays.copyOfRange(input, 1, input.length);
+                interpret(command, params);
+            }
         }
     }
+
+    private static boolean interpret(String str_cmd, String[] params) 
+    {
+        for (CommandType type : CommandType.values()) 
+        {
+            if (str_cmd.equalsIgnoreCase(type.toString().toLowerCase())) {
+                type.execute(params);
+                return true;
+            }
+        }
+
+        System.out.println("Entrée non reconnue.");
+        return false;
+    }
+
     private static void updateGame() {
         // Ici, mettez à jour la logique de votre jeu.
         // Par exemple, gérer les actions des joueurs, les événements du jeu, etc.

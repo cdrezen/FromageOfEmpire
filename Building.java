@@ -60,10 +60,26 @@ public class Building implements BuildingComponent {
     }
 
     @Override
+    public boolean isAtMaxCapacity() {
+        for (BuildingComponent buildingComponent : children) {
+            if(!buildingComponent.isAtMaxCapacity()) return false;
+        }
+        return true;
+    }
+
+    @Override
     public void onBuilt() 
     {
         for (BuildingComponent buildingComponent : children) {
             buildingComponent.onBuilt();
+        }
+    }
+
+    @Override
+    public void clear() {
+        // TODO Auto-generated method stub
+        for (BuildingComponent buildingComponent : children) {
+            buildingComponent.clear();
         }
     }
 
@@ -77,6 +93,53 @@ public class Building implements BuildingComponent {
         }
 
         return String.format("%s %s: [%s]", name, isBuilt() ? "" : "(building...) ", String.join(", ", componentDesc));
+    }
+
+    @Override
+    public ArrayList<Villager> getWorkers() 
+    {
+        ArrayList<Villager> list = new ArrayList<>();
+        
+        for (BuildingComponent buildingComponent : children)
+        {
+            ArrayList<Villager> workers = buildingComponent.getWorkers();
+            if(workers == null) continue;
+            list.addAll(workers);
+        }
+
+        return list;
+    }
+
+    @Override
+    public boolean addWorker(Villager villager) {
+        for (BuildingComponent buildingComponent : children) {
+            if(buildingComponent.addWorker(villager)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeWorker(Villager villager) {
+        for (BuildingComponent buildingComponent : children) {
+            if(buildingComponent.removeWorker(villager)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean addInhabitant(Villager villager) {
+        for (BuildingComponent buildingComponent : children) {
+            if(buildingComponent.addInhabitant(villager)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeInhabitant(Villager villager) {
+        for (BuildingComponent buildingComponent : children) {
+            if(buildingComponent.removeInhabitant(villager)) return true;
+        }
+        return false;
     }
 
     // Méthodes communes à tous les bâtiments, comme upgrade(), repair(), etc.

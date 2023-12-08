@@ -85,7 +85,6 @@ public class Villager
     public void setHome(HousingComponent home) {
         if(isHoused()) this.home.removeInhabitant(this);
         this.home = home;
-        if(home != null) home.addInhabitant(this);
     }
 
     public ProductionComponent getWorkplace() {
@@ -95,7 +94,6 @@ public class Villager
     public void setWorkplace(ProductionComponent workplace) {
         if(isWorker()) this.workplace.removeWorker(this);
         this.workplace = workplace;
-        if(workplace != null) workplace.addWorker(this);
     }
 }
 

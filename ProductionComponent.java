@@ -22,16 +22,24 @@ public class ProductionComponent implements BuildingComponent {
 
     public int getCapacity() { return this.capacity; }
 
-    public boolean isAtMaxCapacity() { return getUsersCount() > this.capacity; }
+    public boolean isAtMaxCapacity() { return getUsersCount() >= this.capacity; }
 
-    public void addWorker(Villager villager) {
-        this.workers.add(villager);
-        //villager.setWorkplace(this);
+    @Override
+    public ArrayList<Villager> getWorkers() {
+        return this.workers;
+    }
+    public boolean addWorker(Villager villager) 
+    {
+        if(isAtMaxCapacity()) return false;
+        boolean success = this.workers.add(villager);
+        if(success) villager.setWorkplace(this);
+        return success;
     }
 
-    public void removeWorker(Villager villager) {
-        this.workers.remove(villager);
-        //villager.setWorkplace(null);
+    public boolean removeWorker(Villager villager) {
+        boolean success = this.workers.remove(villager);
+        if(success) villager.setWorkplace(null);
+        return success;
     }
 
     @Override
@@ -64,6 +72,13 @@ public class ProductionComponent implements BuildingComponent {
     }
 
     @Override
+    public void clear() {
+        for (Villager villager : workers) {
+            villager.setWorkplace(null);
+        }
+    }
+
+    @Override
     public void onBuilt() {
         // TODO Auto-generated method stub
         productionObserver.OnBuiltFactory(this);
@@ -73,5 +88,16 @@ public class ProductionComponent implements BuildingComponent {
     public String toString() {
         // TODO Auto-generated method stub
         return "workers: " + getUsersCount();
+    }
+
+    @Override
+    public boolean addInhabitant(Villager villager) {
+        return false;
+    }
+
+    @Override
+    public boolean removeInhabitant(Villager villager) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

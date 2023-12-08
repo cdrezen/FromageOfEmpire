@@ -1,7 +1,6 @@
 package fromageofempire;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,6 +13,8 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     private ArrayList<Villager> villagers;
     private ArrayList<Villager> dead_villagers;
     private double last_sustainability;
+    private boolean running;
+    private boolean autofill = true;
 
     private GameManager() 
     {
@@ -36,6 +37,11 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         }
         return instance;
     }
+
+    public boolean isRunning() { return this.running; }
+
+    public void start() { running = true; }
+    public void stop() { running = false; }
 
     private void initializeResources() 
     {
@@ -60,61 +66,93 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         {
             Villager v = new Villager(this);
             villagers.add(v);
-            v.setHome(home);
+            home.addInhabitant(v);
         }
     }
 
     public void clearDeadVillagers()
     {
         for (Villager v : dead_villagers) {
-            v.setHome(null);
-            v.setWorkplace(null);
+            if(v.isWorker()) v.workplace.removeWorker(v);
+            if(v.isHoused()) v.home.removeInhabitant(v);
             villagers.remove(v);
         }
 
         dead_villagers.clear();
     }
+
+    public boolean build(BuildingType type)
+    {
+        //empecher si pas assez de resources
+        for (Resource resource : type.getRecipe()) 
+        {
+            if(resource.getQuantity() > resources.get(resource.getType()).getQuantity())
+            {                    
+                System.out.printf("Not enough resources for %s\n", type);
+                return false;
+            }
+        }
+
+       for (Resource resource : type.getRecipe()) { resources.get(resource.getType()).removeQuantity(resource.getQuantity()); }
+       buildings.add(buildingFactory.createBuilding(type));
+
+       return true;
+    }
+
+    public void destroy(int index)
+    {
+        Building building = buildings.get(index);
+        for (Resource resource : building.getType().getRecipe()) { resources.get(resource.getType()).addQuantity(resource.getQuantity()); }
+        building.clear();
+        buildings.remove(index);
+    }
+
+    public void set_autofill(boolean value) 
+    { 
+        this.autofill = value;
+        System.out.println("autofill set to: " + value);
+    }
+    public void switch_autofill() { set_autofill(!this.autofill); }
     
 
-    public void buildCommand(String buildingName)
+    public boolean hireWorkers(int index, int nb)
     {
-        if(buildingName.equals("help"))
+        if(autofill) set_autofill(false);
+        Building building = buildings.get(index);
+        int count = 0;
+        if(nb == -1) nb = villagers.size();
+
+        for (int i = 0; i < villagers.size() && count < nb; i++) 
         {
-            System.out.println("list of buildings:");
-            for (BuildingType type : BuildingType.values()) {
-                System.out.printf("%s %s\n", type.toString().toLowerCase(), Arrays.toString(type.getRecipe()));
-            }
-            return;
+            Villager v = villagers.get(i);
+            if(!v.isWorker() && building.addWorker(v)) count++;
         }
+        
+        return count == nb;
+    }
 
-        BuildingType type = null;
-        for (BuildingType t : BuildingType.values()) {
-            if(t.toString().toLowerCase().equalsIgnoreCase(buildingName)) { 
-                type = t;
-                break;
-            }
-        }
+    public boolean fireWorkers(int index, int nb)
+    {
+        if(autofill) set_autofill(false);
+        Building building = buildings.get(index);
+        int count = 0;
 
-        if(type != null)
+        ArrayList<Villager> workers = building.getWorkers();
+        if(nb == -1) nb = workers.size();
+
+        for (int i = 0; i < workers.size() && count < nb; i++) 
         {
-            //!\\empecher si pas assez de resources
-            for (Resource resource : type.getRecipe()) {
-                if(resource.getQuantity() > resources.get(resource.getType()).getQuantity())
-                {
-                    System.out.printf("Not enough resources for %s\n", type);
-                    return;
-                }
-            }
-
-            for (Resource resource : type.getRecipe()) { resources.get(resource.getType()).removeQuantity(resource.getQuantity()); }
-
-            buildings.add(buildingFactory.createBuilding(type));
+            Villager v = workers.get(i);
+            if(v.isWorker() && building.removeWorker(v)) count++;
         }
-        else buildCommand("help");
+        
+        return count == nb;
     }
 
     public void update()
     {
+        if(!running) return;
+
         for(Villager villager : villagers)
         {
             villager.update();
@@ -135,7 +173,11 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         }
     }
 
-    double sustainability() { return (resources.get(ResourceType.FOOD).getQuantity() + Villager.MAX_STARVATION_DURATION) / (villagers.size() * Villager.FOOD_CONSUMPTION + 1);}
+    double sustainability() 
+    { 
+        int food = resources.get(ResourceType.FOOD).getQuantity();
+        return (food + (food != 0 ? Villager.MAX_STARVATION_DURATION : 0)) / (villagers.size() * Villager.FOOD_CONSUMPTION + 1);
+    }
 
     @Override
     public void OnStarving(Villager source) {
@@ -158,21 +200,23 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     public void OnEmptyHousing(HousingComponent source) {
 
         last_sustainability = sustainability();
-        System.err.println(last_sustainability);
-        if(last_sustainability - 1 >= 0)
+        if(last_sustainability - 1 > 0)
         {
+            System.err.println(last_sustainability + " : spawn");
             addVillagers((int)Math.min(last_sustainability, source.getCapacity()), source);
         } 
     }
 
     @Override
-    public void OnEmptyFactory(ProductionComponent source) {
-        // TODO Auto-generated method stub
+    public void OnEmptyFactory(ProductionComponent source) 
+    {
+        if(!autofill) return;
+
         for (Villager villager : villagers) {
             if(!villager.isWorker())
             {
-                if(source.getCapacity() == source.getUsersCount()) break;
-                villager.setWorkplace(source);
+                if(source.isAtMaxCapacity()) break;
+                source.addWorker(villager);
             }
         }
     }

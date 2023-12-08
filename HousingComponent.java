@@ -21,15 +21,21 @@ class HousingComponent implements BuildingComponent {
     public int getCapacity() {
         return capacity;
     }
+
+    public boolean isAtMaxCapacity() { return getUsersCount() >= this.capacity; }
     
-    public void addInhabitant(Villager villager) {
-        this.inhabitants.add(villager);
-        //villager.setHome(this);
+    public boolean addInhabitant(Villager villager) 
+    {
+        if(isAtMaxCapacity()) return false;
+        boolean success =  this.inhabitants.add(villager);
+        if(success) villager.setHome(this);
+        return success;
     }
 
-    public void removeInhabitant(Villager villager) {
-        this.inhabitants.remove(villager);
-        //villager.setHome(null);
+    public boolean removeInhabitant(Villager villager) {
+        boolean success = this.inhabitants.remove(villager);
+        if(success) villager.setHome(null);
+        return success;
     }
 
     @Override
@@ -38,6 +44,14 @@ class HousingComponent implements BuildingComponent {
         if(inhabitants.size() < this.capacity) 
         {
             housingObserver.OnEmptyHousing(this);
+        }
+    }
+
+    @Override
+    public void clear() {
+        for (Villager villager : inhabitants) {
+            // TODO Auto-generated method stub
+            villager.setHome(null);
         }
     }
 
@@ -55,5 +69,22 @@ class HousingComponent implements BuildingComponent {
     public String toString() {
         // TODO Auto-generated method stub
         return "inhabitants: " + getUsersCount();
+    }
+
+    @Override
+    public boolean addWorker(Villager villager) {
+        // composite..
+        return false;
+    }
+
+    @Override
+    public boolean removeWorker(Villager villager) {
+        return false;
+    }
+
+    @Override
+    public ArrayList<Villager> getWorkers() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
