@@ -84,11 +84,11 @@ public class ProductionComponent implements BuildingComponent {
         // TODO Auto-generated method stub
         productionObserver.OnBuiltFactory(this);
     }
-    
+
     @Override
     public String toString() {
         // TODO Auto-generated method stub
-        return "workers: " + getUsersCount();
+        return "\uD83D\uDC77:" + getUsersCount() + "/" + getCapacity();
     }
 
     @Override

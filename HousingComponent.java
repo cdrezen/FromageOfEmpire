@@ -70,7 +70,7 @@ class HousingComponent implements BuildingComponent {
     @Override
     public String toString() {
         // TODO Auto-generated method stub
-        return "inhabitants: " + getUsersCount();
+        return "\uD83E\uDDD1" + getUsersCount() + "/" + getCapacity();
     }
 
     @Override

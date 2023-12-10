@@ -27,8 +27,8 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         dead_villagers = new ArrayList<>();
         last_sustainability = 1;
 
-        buildings.add(buildingFactory.createBuilding(BuildingType.House));
-        buildings.add(buildingFactory.createBuilding(BuildingType.WoodenCabin));
+        /*buildings.add(buildingFactory.createBuilding(BuildingType.House));
+        buildings.add(buildingFactory.createBuilding(BuildingType.WoodenCabin));*/
     }
 
     public static GameManager getInstance() {
@@ -259,17 +259,27 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         System.out.printf("villagers: %d\n", villagers.size());
     }
 
-    public void displayResources() 
+    public void displayResources()
     {
+        System.out.print("Resources:");
         for (Resource resource : resources.values()) {
-            System.out.printf("resource %s %d\n", resource.getType().toString(), resource.getQuantity());
-        }        
+            System.out.printf(" %s %d   ", resource.getType().toString(), resource.getQuantity());
+        }
+        System.out.printf("\n");
     }
 
     public void displayBuildings() 
     {
+        int cpt = 0;
         for (Building building : buildings) {
-            System.out.println(building.toString());
+            if(cpt%5 == 0){
+                System.out.println(building.toString());
+            }
+            else{
+                System.out.print(building.toString() + "      ");
+            }
+
+            cpt++;
         }   
     }
 
