@@ -2,14 +2,13 @@ package fromageofempire;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class GameManager implements VillagerObserver, HousingObserver, ProductionObserver
 {
     private static GameManager instance;
     private HashMap<ResourceType, Resource> resources;
     private BuildingFactory buildingFactory;
-    private List<Building> buildings;
+    private HashMap<Integer, Building> buildings;
     private ArrayList<Villager> villagers;
     private ArrayList<Villager> dead_villagers;
     private double last_sustainability;
@@ -24,7 +23,7 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         initializeResources(); // Remplissage du HashMap avec les ressources initiales
 
         buildingFactory = new BuildingFactory(this);
-        buildings = new ArrayList<>();
+        buildings = new HashMap<>();
         villagers = new ArrayList<>();
         dead_villagers = new ArrayList<>();
         last_sustainability = 1;
@@ -67,8 +66,9 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     }
 
     public void addBuilding(Building building) {
-        buildings.add(building);
+        buildings.put(building.getId(), building);
     }
+
     public void addVillagers(int quantity, HousingComponent home)
     {
         for (int i = 0; i < quantity; i++) 
@@ -103,17 +103,18 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         }
 
        for (Resource resource : type.getRecipe()) { resources.get(resource.getType()).removeQuantity(resource.getQuantity()); }
-       buildings.add(buildingFactory.createBuilding(type));
+       addBuilding(buildingFactory.createBuilding(type));
 
        return true;
     }
 
-    public void destroy(int index)
+    public void destroy(int id)
     {
-        Building building = buildings.get(index);
+        Building building = buildings.get(id);
+        if(building == null) return;
         for (Resource resource : building.getType().getRecipe()) { resources.get(resource.getType()).addQuantity(resource.getQuantity()); }
         building.clear();
-        buildings.remove(index);
+        buildings.remove(id);
     }
 
     public void set_autofill(boolean value) 
@@ -124,10 +125,11 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     public void switch_autofill() { set_autofill(!this.autofill); }
     
 
-    public boolean hireWorkers(int index, int nb)
+    public boolean hireWorkers(int id, int nb)
     {
         if(autofill) set_autofill(false);
-        Building building = buildings.get(index);
+        Building building = buildings.get(id);
+        if(building == null) return false;
         int count = 0;
         if(nb == -1) nb = villagers.size();
 
@@ -140,10 +142,10 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         return count == nb;
     }
 
-    public boolean fireWorkers(int index, int nb)
+    public boolean fireWorkers(int id, int nb)
     {
         if(autofill) set_autofill(false);
-        Building building = buildings.get(index);
+        Building building = buildings.get(id);
         int count = 0;
 
         ArrayList<Villager> workers = building.getWorkers();
@@ -166,7 +168,8 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         {
             villager.update();
         }
-        for (Building building : buildings)
+
+        for (Building building : buildings.values())
         {
             building.update();
         }
@@ -209,7 +212,7 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         if(resources.get(ResourceType.GOLD).getQuantity() < 4)
         {
             boolean is_quarry_built = false;
-            for (Building building : buildings) {
+            for (Building building : buildings.values()) {
                 if(building.getType() == BuildingType.Quarry) {
                     is_quarry_built = true;
                     break;
@@ -240,13 +243,20 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     }
     
     @Override
-    public void OnEmptyHousing(HousingComponent source) {
+    public void OnEmptyHousing(HousingComponent source) 
+    {
+        for (Villager villager : villagers) 
+        {
+            if(!villager.isHoused() && !source.isAtMaxCapacity()) source.addInhabitant(villager);
+            if(source.isAtMaxCapacity()) return;
+        }
 
         last_sustainability = sustainability();
         if(last_sustainability - 1 > 0)
         {
-            System.err.println(last_sustainability + " : spawn");
-            addVillagers((int)Math.min(last_sustainability, source.getCapacity()), source);
+            int nb_to_spawn = (int)Math.min(last_sustainability, source.getCapacity());
+            addVillagers(nb_to_spawn, source);
+            System.out.printf("%.0f : %d spawned\n", last_sustainability, nb_to_spawn);
         } 
     }
 
@@ -306,7 +316,7 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     public void displayBuildings() 
     {
         int cpt = 0;
-        for (Building building : buildings) {
+        for (Building building : buildings.values()) {
             if(cpt%5 == 0){
                 System.out.println(building.toString());
             }

@@ -75,11 +75,11 @@ public enum CommandType implements Command
     static void destroyCommand(String[] params)
     {
         if(params.length < 1) {
-            System.out.println("Usage: destroy <index> <nb(optional)>"); 
+            System.out.println("Usage: destroy <id>"); 
             return;
         }
-        int index = parseInt(params[0]);
-        if(index > -1) GameManager.getInstance().destroy(index);
+        int id = parseInt(params[0]);
+        if(id > -1) GameManager.getInstance().destroy(id);
     }
 
     static void hireCommand(String[] params)
