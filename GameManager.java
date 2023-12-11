@@ -57,10 +57,14 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
             resources.put(type, new Resource(type, 0));
         }
 
-        resources.get(ResourceType.GOLD).setQuantity(25);
-        resources.get(ResourceType.FOOD).setQuantity(50);
-        resources.get(ResourceType.WOOD).setQuantity(100);
-        resources.get(ResourceType.STONE).setQuantity(100);
+        resources.get(ResourceType.GOLD).setQuantity(9999);
+        resources.get(ResourceType.FOOD).setQuantity(500);
+        resources.get(ResourceType.WOOD).setQuantity(1000);
+        resources.get(ResourceType.STONE).setQuantity(1000);
+        resources.get(ResourceType.LUMBER).setQuantity(1000);
+        resources.get(ResourceType.STEEL).setQuantity(1000);
+
+
 
         Villager.setFoodSource(resources.get(ResourceType.FOOD));
     }
@@ -228,7 +232,9 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         return (food + (food != 0 ? Villager.MAX_STARVATION_DURATION : 0)) / (villagers.size() * Villager.FOOD_CONSUMPTION + 1);
     }
 
-
+    public boolean isGameWon() {
+        return resources.get(ResourceType.FROMAGEDOR).getQuantity() >0;
+    }
     public boolean isGameLost() {
         // On vérifie si le jeu est perdu en fonction de l'état de durabilité et de la population des villageois
         // Si la durabilité est de 0 et qu'il n'y a plus de villageois, le jeu est perdu
@@ -359,7 +365,7 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     // Affiche les bâtiments actuellement en jeu
     public void displayBuildings()
     {
-        int cpt = 0;
+        int cpt = 1;
         for (Building building : buildings.values()) {
             // Afficher maximum 5 bâtiments dans une même ligne.
             if(cpt%5 == 0){

@@ -49,7 +49,11 @@ public enum BuildingType
     CoalMine(4, 
         new Production(Resource.asArray(new Resource(ResourceType.LUMBER, 2), new Resource(ResourceType.TOOLS, 2)), 
                         new Resource(ResourceType.COAL, 10)),
-        new Resource(ResourceType.GOLD, 6), new Resource(ResourceType.LUMBER, 5), new Resource(ResourceType.STONE, 50), new Resource(ResourceType.CEMENT, 50))
+        new Resource(ResourceType.GOLD, 6), new Resource(ResourceType.LUMBER, 5), new Resource(ResourceType.STONE, 50), new Resource(ResourceType.CEMENT, 50)),
+
+    GoldFromagerie(10,
+            new Production(new Resource(ResourceType.FROMAGEDOR, 1)),
+            new Resource(ResourceType.GOLD, 50), new Resource(ResourceType.LUMBER, 50), new Resource(ResourceType.STEEL, 25)),
     ;
     
     int buildTime;
