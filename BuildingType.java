@@ -36,7 +36,20 @@ public enum BuildingType
     ToolFactory(8, 
         new Production(Resource.asArray(new Resource(ResourceType.STEEL, 4), new Resource(ResourceType.COAL, 4)), 
                         Resource.asArray(new Resource(ResourceType.TOOLS, 4))),
-        new Resource(ResourceType.GOLD, 8), new Resource(ResourceType.WOOD, 50), new Resource(ResourceType.STONE, 50))
+        new Resource(ResourceType.GOLD, 8), new Resource(ResourceType.WOOD, 50), new Resource(ResourceType.STONE, 50)),
+
+    SmallQuarry(2, 
+        new Production(new Resource(ResourceType.STONE, 4)),
+        new Resource(ResourceType.GOLD, 2), new Resource(ResourceType.WOOD, 25)),
+    
+    Fromagerie(4, 
+        new Production(new Resource(ResourceType.FOOD, 10), new Resource(ResourceType.FOOD, 50)),
+        new Resource(ResourceType.GOLD, 6), new Resource(ResourceType.WOOD, 50), new Resource(ResourceType.STONE, 50)),
+
+    CoalMine(4, 
+        new Production(Resource.asArray(new Resource(ResourceType.LUMBER, 2), new Resource(ResourceType.TOOLS, 2)), 
+                        new Resource(ResourceType.COAL, 10)),
+        new Resource(ResourceType.GOLD, 6), new Resource(ResourceType.LUMBER, 5), new Resource(ResourceType.STONE, 50), new Resource(ResourceType.CEMENT, 50))
     ;
     
     int buildTime;

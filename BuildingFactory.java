@@ -43,6 +43,15 @@ public class BuildingFactory {
             case ToolFactory:
                 building.add(new ProductionComponent(12, type.getProduction()));
                 break;
+            case SmallQuarry:
+                building.add(new ProductionComponent(10, type.getProduction()));
+                break;
+            case Fromagerie:
+                building.add(new ProductionComponent(10, type.getProduction()));
+                break;
+            case CoalMine: 
+                building.add(new ProductionComponent(10, type.getProduction()));
+                break;
             // Ajouter d'autres types de bâtiments
             default:
                 throw new IllegalArgumentException("Invalid building type");

@@ -30,8 +30,9 @@ public class Resource implements Serializable {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public boolean setQuantity(int quantity) {
         this.quantity = quantity;
+        return this.quantity != 0;
     }
 
     public void addQuantity(int quantity)
@@ -39,10 +40,11 @@ public class Resource implements Serializable {
         this.quantity += quantity;
     }
 
-    public void removeQuantity(int quantity)
+    public boolean removeQuantity(int quantity)
     {
         this.quantity -= quantity;
-        //if(this.quantity < 0) this.quantity = 0;
+        if(this.quantity < 0) this.quantity = 0;
+        return this.quantity != 0;
     }
 
     public static Resource[] asArray(Resource ... resources)

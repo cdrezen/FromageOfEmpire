@@ -7,10 +7,20 @@ public class Production
     double tmp_efficiency = 0;
     boolean requiresMoreEfficiency = false;
 
-    public Production(Resource[] input, Resource[] output) 
+    public Production(Resource[] input, Resource ... output) 
     {
         this.input = input;
         this.output = output;
+    }
+
+    public Production(Resource[] input, Resource output) 
+    {
+        this(input, Resource.asArray(output));
+    }
+
+    public Production(Resource input, Resource[] output) 
+    {
+        this(Resource.asArray(input), output);
     }
 
     public Production(Resource ... output) 

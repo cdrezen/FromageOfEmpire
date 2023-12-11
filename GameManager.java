@@ -49,10 +49,10 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
             resources.put(type, new Resource(type, 0));
         }
 
-        resources.get(ResourceType.GOLD).setQuantity(7);
-        resources.get(ResourceType.FOOD).setQuantity(20);
-        resources.get(ResourceType.WOOD).setQuantity(25);
-        resources.get(ResourceType.STONE).setQuantity(25);
+        resources.get(ResourceType.GOLD).setQuantity(25);
+        resources.get(ResourceType.FOOD).setQuantity(50);
+        resources.get(ResourceType.WOOD).setQuantity(100);
+        resources.get(ResourceType.STONE).setQuantity(100);
 
         Villager.setFoodSource(resources.get(ResourceType.FOOD));
     }
@@ -164,7 +164,7 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
 
         if(dead_villagers.size() > 0) clearDeadVillagers();
         last_sustainability = sustainability();
-        System.out.println(last_sustainability);
+        System.out.println("sustainability: " + last_sustainability);
     }
 
     public void changeResourceQuantity(ResourceType type, int amount) {
@@ -243,20 +243,32 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
 
     @Override
     public void OnProducedResource(ProductionComponent source, Production produced) {
+        
+        if(produced.hasInput())
+        {
+            for (Resource loss : produced.getInput()) {
+                if(!resources.get(loss.getType()).removeQuantity(loss.getQuantity())) return;// return si pas assez de resources
+            }
+        }
         for (Resource product : produced.getOutput()) {
             resources.get(product.getType()).addQuantity(product.getQuantity());
-        }
-        if(!produced.hasInput()) return;
-        for (Resource loss : produced.getInput()) {
-            resources.get(loss.getType()).removeQuantity(loss.getQuantity());
-        }
+        }     
     }
 
     // ... autres méthodes du GameManager ...
     
     public void displayVillagers()
     {
-        System.out.printf("villagers: %d\n", villagers.size());
+        int unemployed = 0;
+        int homeless = 0;
+
+        for (Villager villager : villagers) 
+        {
+            if(!villager.isWorker()) unemployed++;
+            if(!villager.isHoused()) homeless++;
+        }
+
+        System.out.printf("villagers: %d unemployed: %d homeless: %d\n", villagers.size(), unemployed, homeless);
     }
 
     public void displayResources()
