@@ -16,6 +16,8 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     private boolean running;
     private boolean autofill = true;
 
+    private HashMap<ResourceType, Integer> resourceChange;
+    private HashMap<ResourceType, Integer> lastResourceQuantities;
     private GameManager() 
     {
         resources = new HashMap<>(); // Initialisation du HashMap
@@ -26,7 +28,14 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         villagers = new ArrayList<>();
         dead_villagers = new ArrayList<>();
         last_sustainability = 1;
-
+        resourceChange = new HashMap<>();
+        for (ResourceType type : ResourceType.values()) {
+            resourceChange.put(type, 0);
+        }
+        lastResourceQuantities = new HashMap<>();
+        for (ResourceType type : ResourceType.values()) {
+            lastResourceQuantities.put(type, 0);
+        }
         /*buildings.add(buildingFactory.createBuilding(BuildingType.House));
         buildings.add(buildingFactory.createBuilding(BuildingType.WoodenCabin));*/
     }
@@ -165,8 +174,22 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         if(dead_villagers.size() > 0) clearDeadVillagers();
         last_sustainability = sustainability();
         System.out.println("sustainability: " + last_sustainability);
+        updateResourceChange();
+
+        // Enregistrer l'état actuel des ressources pour le prochain tour
+        for (ResourceType type : ResourceType.values()) {
+            lastResourceQuantities.put(type, resources.get(type).getQuantity());
+        }
     }
 
+    private void updateResourceChange() {
+        for (ResourceType type : ResourceType.values()) {
+            int lastQuantity = lastResourceQuantities.getOrDefault(type, 0);
+            int currentQuantity = resources.get(type).getQuantity();
+            int change = currentQuantity - lastQuantity;
+            resourceChange.put(type, change);
+        }
+    }
     public void changeResourceQuantity(ResourceType type, int amount) {
         if (resources.containsKey(type)) {
             resources.get(type).setQuantity(amount);
@@ -275,7 +298,7 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
     {
         System.out.print("Resources:");
         for (Resource resource : resources.values()) {
-            System.out.printf(" %s %d   ", resource.getType().toString(), resource.getQuantity());
+            System.out.printf(" %s %d(%d)   ", resource.getType().toString(), resource.getQuantity(), resourceChange.get(resource.getType()));
         }
         System.out.printf("\n");
     }

@@ -4,6 +4,9 @@ import java.util.Arrays;
 
 public class Building implements BuildingComponent {
     BuildingType type;
+    private static int nextId = 0;
+    private int id;
+
     int level;    // Niveau ou état du bâtiment
     int buildTime = 1;
     int currentBuildStep = 0;
@@ -13,6 +16,7 @@ public class Building implements BuildingComponent {
     //protected static BuildingObserver observer;
 
     public Building(BuildingType type) {
+        this.id = nextId++;
         this.type = type;
         this.level = 1; // Niveau initial
         this.buildTime = type.buildTime;
@@ -21,6 +25,8 @@ public class Building implements BuildingComponent {
     }
 
     public BuildingType getType() { return this.type; }
+    public int getId() { return id; }
+
 
     public boolean isBuilt() { return (currentBuildStep > buildTime);}
 
@@ -92,7 +98,7 @@ public class Building implements BuildingComponent {
             componentDesc.add(buildingComponent.toString());
         }
 
-        return String.format("%s %s: [%s]", name, isBuilt() ? "" : "(building...) ", String.join(", ", componentDesc));
+        return String.format("%s(%d) %s: [%s]", name,this.getId(), isBuilt() ? "" : "(building...) ", String.join(", ", componentDesc));
     }
 
     @Override
