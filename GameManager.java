@@ -57,10 +57,14 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
             resources.put(type, new Resource(type, 0));
         }
 
-        resources.get(ResourceType.GOLD).setQuantity(25);
-        resources.get(ResourceType.FOOD).setQuantity(50);
-        resources.get(ResourceType.WOOD).setQuantity(100);
-        resources.get(ResourceType.STONE).setQuantity(100);
+        resources.get(ResourceType.GOLD).setQuantity(9999);
+        resources.get(ResourceType.FOOD).setQuantity(500);
+        resources.get(ResourceType.WOOD).setQuantity(1000);
+        resources.get(ResourceType.STONE).setQuantity(1000);
+        resources.get(ResourceType.LUMBER).setQuantity(1000);
+        resources.get(ResourceType.STEEL).setQuantity(1000);
+
+
 
         Villager.setFoodSource(resources.get(ResourceType.FOOD));
     }
@@ -90,24 +94,27 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         dead_villagers.clear();
     }
 
-    public boolean build(BuildingType type)
-    {
-        //empecher si pas assez de resources
-        for (Resource resource : type.getRecipe()) 
-        {
-            if(resource.getQuantity() > resources.get(resource.getType()).getQuantity())
-            {                    
+    public boolean build(BuildingType type) {
+        // Vérifier si suffisamment de ressources sont disponibles pour construire le bâtiment
+        for (Resource resource : type.getRecipe()) {
+            // Comparer la quantité de ressources requise pour la construction du bâtiment avec la quantité disponible.
+            if(resource.getQuantity() > resources.get(resource.getType()).getQuantity()) {
                 System.out.printf("Not enough resources for %s\n", type);
                 return false;
             }
         }
 
-       for (Resource resource : type.getRecipe()) { resources.get(resource.getType()).removeQuantity(resource.getQuantity()); }
-       addBuilding(buildingFactory.createBuilding(type));
-
-       return true;
+        // Si toutes les ressources requises sont disponibles, on enlève des ressources globales.
+        for (Resource resource : type.getRecipe()) {
+            resources.get(resource.getType()).removeQuantity(resource.getQuantity());
+        }
+        addBuilding(buildingFactory.createBuilding(type));
+        return true;
     }
 
+
+    // Méthode qui détruit un bâtiment en prenant en paramètre son id.
+    // Lors de la destruction, les ressources qui ont été utilisé pour construire le bâtiment sont redonnés au joueur.
     public void destroy(int id)
     {
         Building building = buildings.get(id);
@@ -117,6 +124,7 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         buildings.remove(id);
     }
 
+    // Gestion d'activation du système d'auto-remplissage.
     public void set_autofill(boolean value) 
     { 
         this.autofill = value;
@@ -127,38 +135,54 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
 
     public boolean hireWorkers(int id, int nb)
     {
-        if(autofill) set_autofill(false);
+        // On récupère le bâtiment basé sur son id
         Building building = buildings.get(id);
-        if(building == null) return false;
+        if(building == null) return false; // On retourne false si le bâtiment n'est pas trouvé ou a été détruit.
+
+        // On désactive l'auto-remplissage si c'est activé
+        if(autofill) set_autofill(false);
         int count = 0;
         if(nb == -1) nb = villagers.size();
 
+        // On parcoure la liste des travailleurs et les ajouter jusqu'à atteindre le nombre souhaité.
         for (int i = 0; i < villagers.size() && count < nb; i++) 
         {
+            // Si nb est égal à -1, ajouter tous les travailleurs.
             Villager v = villagers.get(i);
+
+            // On vérifie si le villageois est un chômeur et on l'ajoute au bâtiment.
             if(!v.isWorker() && building.addWorker(v)) count++;
         }
         
         return count == nb;
     }
 
-    public boolean fireWorkers(int id, int nb)
-    {
-        if(autofill) set_autofill(false);
+    public boolean fireWorkers(int id, int nb) {
+        // On récupère le bâtiment basé sur son id
         Building building = buildings.get(id);
-        int count = 0;
+        if (building == null) return false;  // On retourne false si le bâtiment n'est pas trouvé ou a été détruit.
+
+        // On désactive l'auto-remplissage si c'est activé.
+        if(autofill) set_autofill(false);
+
+        int count = 0;  // Compteur pour le nombre de travailleurs licenciés.
 
         ArrayList<Villager> workers = building.getWorkers();
+
+        // Si nb est égal à -1, licencier tous les travailleurs
         if(nb == -1) nb = workers.size();
 
-        for (int i = 0; i < workers.size() && count < nb; i++) 
-        {
+        // On parcoure la liste des travailleurs et les licencier jusqu'à atteindre le nombre souhaité.
+        for (int i = 0; i < workers.size() && count < nb; i++) {
             Villager v = workers.get(i);
+
+            // On vérifie si le villageois est un travailleur et le retirer du bâtiment.
             if(v.isWorker() && building.removeWorker(v)) count++;
         }
-        
+        // Retourne true si le nombre de travailleurs licenciés correspond au nombre demandé.
         return count == nb;
     }
+
 
     public void update()
     {
@@ -185,6 +209,7 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         }
     }
 
+    // Méthode pour avoir la différence de quantité entre le tour d'avant et celui-ci pour l'afficher dans la méthode displayResources().
     private void updateResourceChange() {
         for (ResourceType type : ResourceType.values()) {
             int lastQuantity = lastResourceQuantities.getOrDefault(type, 0);
@@ -199,31 +224,41 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         }
     }
 
-    double sustainability() 
-    { 
+
+    double sustainability() {
         int food = resources.get(ResourceType.FOOD).getQuantity();
+        // Si la nourriture est disponible, on ajoute à cette quantité le temps maximal de survie sans nourriture (MAX_STARVATION_DURATION)
+        // Diviser par le total de la consommation de nourriture par les villageois et ajouter 1 pour éviter la division par zéro
         return (food + (food != 0 ? Villager.MAX_STARVATION_DURATION : 0)) / (villagers.size() * Villager.FOOD_CONSUMPTION + 1);
     }
 
-    public boolean isGameLost()
-    {
+    public boolean isGameWon() {
+        return resources.get(ResourceType.FROMAGEDOR).getQuantity() >0;
+    }
+    public boolean isGameLost() {
+        // On vérifie si le jeu est perdu en fonction de l'état de durabilité et de la population des villageois
+        // Si la durabilité est de 0 et qu'il n'y a plus de villageois, le jeu est perdu
         if(sustainability() == 0 && villagers.size() == 0) return true;
-        
-        if(resources.get(ResourceType.GOLD).getQuantity() < 4)
-        {
+
+        // On vérifie si la quantité de ressources d'or est inférieur à 4
+        // car c'est le minimum pour construire une carrière (car elle produit de l'or, donc qui permettra de construire d'autre bâtiment).
+        if(resources.get(ResourceType.GOLD).getQuantity() < 4) {
+            //Si c'est le cas, alors on vérifie si une carrière a déjà été construit
             boolean is_quarry_built = false;
             for (Building building : buildings.values()) {
                 if(building.getType() == BuildingType.Quarry) {
                     is_quarry_built = true;
-                    break;
+                    break; // Arrêter la recherche dès qu'une carrière est trouvée
                 }
             }
+            // Si aucune carrière n'est construite et que l'or est insuffisant, le jeu est perdu
             if(!is_quarry_built) return true;
         }
 
-
+        // Si aucune des conditions ci-dessus n'est remplie, le jeu n'est pas perdu
         return false;
     }
+
 
     @Override
     public void OnStarving(Villager source) {
@@ -241,25 +276,32 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         // TODO Auto-generated method stub
         //throw new UnsupportedOperationException("Unimplemented method 'OnBuiltFactory'");
     }
-    
+
+    // Réagit lorsqu'un logement est vide ou partiellement vide.
     @Override
-    public void OnEmptyHousing(HousingComponent source) 
-    {
-        for (Villager villager : villagers) 
-        {
-            if(!villager.isHoused() && !source.isAtMaxCapacity()) source.addInhabitant(villager);
+    public void OnEmptyHousing(HousingComponent source) {
+        // Parcourir tous les villageois
+        for (Villager villager : villagers) {
+            // Si un villageois n'est pas logé et que le logement n'est pas à pleine capacité
+            if(!villager.isHoused() && !source.isAtMaxCapacity()) {
+                // Ajouter le villageois au logement
+                source.addInhabitant(villager);
+            }
             if(source.isAtMaxCapacity()) return;
         }
-
+        // Calcule de l'indice de durabilité actuel du jeu
         last_sustainability = sustainability();
-        if(last_sustainability - 1 > 0)
-        {
+        if(last_sustainability - 1 > 0) {
+            // Calcule du nombre de villageois à générer et ajouter dans la liste. Cela dépend de la durabilité et de la capacité du logement.
             int nb_to_spawn = (int)Math.min(last_sustainability, source.getCapacity());
             addVillagers(nb_to_spawn, source);
             System.out.printf("%.0f : %d spawned\n", last_sustainability, nb_to_spawn);
-        } 
+        }
     }
 
+
+    /*Réagit lorsqu'une usine n'a pas atteint sa capacité max de travailleurs.
+      Si l'auto-remplissage est activé, les villageois chômeurs sont automatiquement placés dans des bâtiments de production qui ne sont pas remplis*/
     @Override
     public void OnEmptyFactory(ProductionComponent source) 
     {
@@ -274,22 +316,28 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         }
     }
 
+    // Met à jour les ressources lorsqu'une production est réalisée
     @Override
     public void OnProducedResource(ProductionComponent source, Production produced) {
-        
-        if(produced.hasInput())
-        {
+        // Vérifier si le bâtiment doit consommer des ressources avant de produire
+        if(produced.hasInput()) {
+            // Parcourir toutes les ressources nécessaires pour la production
             for (Resource loss : produced.getInput()) {
-                if(!resources.get(loss.getType()).removeQuantity(loss.getQuantity())) return;// return si pas assez de resources
+                 //Si la ressource nécessaire à la consommation n'est pas suffisant, return sans ajouter la quantité produite
+                if(!resources.get(loss.getType()).removeQuantity(loss.getQuantity())) {
+                    return;
+                }
             }
         }
+        // Parcourir toutes les ressources produites par le bâtiment
         for (Resource product : produced.getOutput()) {
+            // Ajouter la quantité de chaque ressource produite
             resources.get(product.getType()).addQuantity(product.getQuantity());
-        }     
+        }
     }
 
-    // ... autres méthodes du GameManager ...
-    
+
+    // Affiche des informations sur les villageois
     public void displayVillagers()
     {
         int unemployed = 0;
@@ -304,6 +352,7 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         System.out.printf("villagers: %d unemployed: %d homeless: %d\n", villagers.size(), unemployed, homeless);
     }
 
+    // Affiche l'état actuel des ressources
     public void displayResources()
     {
         System.out.print("Resources:");
@@ -313,10 +362,12 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
         System.out.printf("\n");
     }
 
-    public void displayBuildings() 
+    // Affiche les bâtiments actuellement en jeu
+    public void displayBuildings()
     {
-        int cpt = 0;
+        int cpt = 1;
         for (Building building : buildings.values()) {
+            // Afficher maximum 5 bâtiments dans une même ligne.
             if(cpt%5 == 0){
                 System.out.println(building.toString());
             }

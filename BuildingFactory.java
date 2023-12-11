@@ -51,6 +51,8 @@ public class BuildingFactory {
                 break;
             case CoalMine: 
                 building.add(new ProductionComponent(10, type.getProduction()));
+            case GoldFromagerie:
+                building.add(new ProductionComponent(100, type.getProduction()));
                 break;
             // Ajouter d'autres types de bâtiments
             default:

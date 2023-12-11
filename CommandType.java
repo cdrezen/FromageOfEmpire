@@ -9,6 +9,7 @@ public enum CommandType implements Command
     HIRE(CommandType::hireCommand),
     FIRE(CommandType::fireCommand),
     AUTOFILL(CommandType::autofill),
+    HELP(CommandType::helpCommand),
     Q(CommandType::quit);
 
     Command command;
@@ -23,6 +24,17 @@ public enum CommandType implements Command
         command.execute(args);
     }
 
+
+    static void helpCommand(String[] args)
+    {
+        System.out.println("List of commands:");
+        System.out.println("Usage: build <BuildingType>");
+        System.out.println("Usage: hire/fire <index> <nb(optional)>"); // Si on utilise pas nb c'est toute la capacité du bâtiment qui est pris en compte.
+        System.out.println("Usage: destroy <index>");
+        System.out.println("Usage: autofill");
+    }
+
+
     static void buildCommand(String[] params)
     {
         String buildingName = "";
@@ -30,7 +42,7 @@ public enum CommandType implements Command
 
         if(params.length < 1 || buildingName.equals("help"))
         {
-            System.out.println("list of buildings:");
+            System.out.println("List of buildings:");
             for (BuildingType type : BuildingType.values()) {
                 System.out.printf("%s %s\n", type.toString().toLowerCase(), Arrays.toString(type.getRecipe()));
             }
