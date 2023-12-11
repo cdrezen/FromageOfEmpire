@@ -73,7 +73,7 @@ public enum CommandType implements Command
     static int[] parseIndexAndSize(String[] params)
     {
         if(params.length < 1) {
-            System.out.println("Usage: hire/fire <index> <nb(optional)>"); 
+            System.out.println("Usage: hire/fire <id> <nb(optional)>"); 
             return null;
         }
         if(params.length < 1) return null;
