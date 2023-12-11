@@ -57,15 +57,10 @@ public class GameManager implements VillagerObserver, HousingObserver, Productio
             resources.put(type, new Resource(type, 0));
         }
 
-        resources.get(ResourceType.GOLD).setQuantity(9999);
-        resources.get(ResourceType.FOOD).setQuantity(500);
-        resources.get(ResourceType.WOOD).setQuantity(1000);
-        resources.get(ResourceType.STONE).setQuantity(1000);
-        resources.get(ResourceType.LUMBER).setQuantity(1000);
-        resources.get(ResourceType.STEEL).setQuantity(1000);
-
-
-
+        resources.get(ResourceType.GOLD).setQuantity(100);
+        resources.get(ResourceType.FOOD).setQuantity(50);
+        resources.get(ResourceType.WOOD).setQuantity(200);
+        resources.get(ResourceType.STONE).setQuantity(100);
         Villager.setFoodSource(resources.get(ResourceType.FOOD));
     }
 

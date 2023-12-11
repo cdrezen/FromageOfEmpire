@@ -28,7 +28,7 @@ public enum CommandType implements Command
     static void helpCommand(String[] args)
     {
         System.out.println("List of commands:");
-        System.out.println("Usage: build <BuildingType>");
+        System.out.println("Usage: build <BuildingType> (\"build help\" pour plus d'information)");
         System.out.println("Usage: hire/fire <index> <nb(optional)>"); // Si on utilise pas nb c'est toute la capacité du bâtiment qui est pris en compte.
         System.out.println("Usage: destroy <index>");
         System.out.println("Usage: autofill");
